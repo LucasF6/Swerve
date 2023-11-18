@@ -24,7 +24,6 @@ public class SwerveModule {
 
   private Rotation2d m_angleMeasurement;
   private Rotation2d m_angleReference;
-  private double output;
     
   public SwerveModule(int driveID, int steerID, int encoderID, boolean driveInverted, 
                       boolean steerInverted, double magnetOffset) {
@@ -62,9 +61,7 @@ public class SwerveModule {
         m_angleMeasurement.getRotations(),
         m_angleReference.getRotations()));
 
-    output = SQUARED_INPUTS ? MAX_OUTPUT * Math.pow(state.speedMetersPerSecond, 2)
-                            : MAX_OUTPUT * state.speedMetersPerSecond;
-    m_driveMotor.set(output);
+    m_driveMotor.set(MAX_OUTPUT * state.speedMetersPerSecond);
   }
 
   public Rotation2d getAngleMeasurement() {

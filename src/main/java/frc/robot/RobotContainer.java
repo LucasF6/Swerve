@@ -10,6 +10,8 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.DefaultDrive;
 import frc.robot.subsystems.SwerveSubsystem;
 
+import static frc.robot.Constants.Swerve.SQUARED_INPUTS;
+
 public class RobotContainer {
   private XboxController m_controller = new XboxController(1);
 
@@ -17,9 +19,9 @@ public class RobotContainer {
 
   private DefaultDrive m_defaultDrive = new DefaultDrive(
     m_swerveSubsystem,
-    m_controller::getLeftY,
-    m_controller::getLeftX,
-    m_controller::getRightX);
+    () -> input(m_controller.getLeftY(), SQUARED_INPUTS),
+    () -> input(m_controller.getLeftX(), SQUARED_INPUTS),
+    () -> input(m_controller.getRightX(), SQUARED_INPUTS)); 
 
   public RobotContainer() {
     m_swerveSubsystem.setDefaultCommand(m_defaultDrive);
@@ -31,5 +33,9 @@ public class RobotContainer {
 
   public Command getAutonomousCommand() {
     return Commands.print("No autonomous command configured");
+  }
+
+  private double input(double input, boolean squared) {
+    return squared ? (input > 0 ? 1 : -1) * Math.pow(input, 2) : input;
   }
 }
