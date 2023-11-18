@@ -44,7 +44,8 @@ public class SwerveModule {
 
     m_driveEncoder = m_driveMotor.getEncoder();
     m_driveEncoder.setPosition(0);
-    m_driveEncoder.setPositionConversionFactor(1);
+    m_driveEncoder.setPositionConversionFactor(POSITION_CONVERSION);
+    m_driveEncoder.setVelocityConversionFactor(VELOCITY_CONVERSION);
 
     m_steerController = new PIDController(STEER_kP, STEER_kI, STEER_kD);
     m_steerController.enableContinuousInput(0, 1.0);
@@ -76,6 +77,18 @@ public class SwerveModule {
 
   public SwerveModulePosition getModulePosition() {
     return new SwerveModulePosition(m_driveEncoder.getPosition(), getAngleMeasurement());
+  }
+
+  public double getAngleDegrees() {
+    return m_angleMeasurement.getDegrees();
+  }
+
+  public double getDesiredAngleDegrees() {
+    return m_angleReference.getDegrees();
+  }
+
+  public double getVelocity() {
+    return m_driveEncoder.getVelocity();
   }
 
 }
