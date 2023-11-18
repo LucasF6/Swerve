@@ -49,11 +49,7 @@ public class SwerveSubsystem extends SubsystemBase {
   private Pose2d m_pose = new Pose2d();
   private SwerveModulePosition[] m_modulePositions = new SwerveModulePosition[4];
 
-  private SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
-    m_kinematics,
-    getAngle(),
-    getModulePositions(),
-    m_pose);
+  private SwerveDriveOdometry m_odometry;
 
   // This is for advantage scope
   private NetworkTable m_moduleStatesTable = 
@@ -71,11 +67,22 @@ public class SwerveSubsystem extends SubsystemBase {
   private double m_gyroAngle;
 
   /** Creates a new SwerveSubsystem. */
-  public SwerveSubsystem() {}
+  public SwerveSubsystem() {
+    for (int i = 0; i < 4; i++) {
+      m_modulePositions[i] = m_modules[i].getModulePosition();
+    }
+
+    m_odometry = new SwerveDriveOdometry(
+        m_kinematics,
+        getAngle(),
+        m_modulePositions,
+        m_pose);
+  }
 
   @Override
   public void periodic() {
     for (int i = 0; i < 4; i++) {
+      m_modulePositions[i] = m_modules[i].getModulePosition();
       // this is for advantage scope
       m_moduleMeasurements[2 * i] = m_modules[i].getAngleDegrees();
       m_moduleMeasurements[2 * i + 1] = m_modules[i].getVelocity();
@@ -83,7 +90,7 @@ public class SwerveSubsystem extends SubsystemBase {
       m_moduleSetpoints[2 * i + 1] = m_modules[i].getVelocity();
     }
 
-    m_pose = m_odometry.update(getAngle(), getModulePositions());
+    m_pose = m_odometry.update(getAngle(), m_modulePositions);
 
     // this is for advantage scope
     m_gyroAngle = m_gyro.getYaw();
@@ -109,15 +116,12 @@ public class SwerveSubsystem extends SubsystemBase {
     return Rotation2d.fromDegrees(m_gyro.getYaw());
   }
 
-  public void zeroYaw() {
-    m_gyro.setYaw(0);
+  public Pose2d getPose() {
+    return m_pose;
   }
 
-  private SwerveModulePosition[] getModulePositions() {
-    for (int i = 0; i < 4; i++) {
-      m_modulePositions[i] = m_modules[i].getModulePosition();
-    }
-    return m_modulePositions;
+  public void zeroYaw() {
+    m_gyro.setYaw(0);
   }
 
 }
